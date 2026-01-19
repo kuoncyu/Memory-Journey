@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Mind: Ultimate Rev2</title>
+    <style>
+        :root {
+            --bg-color: #050010;
+            --primary-color: #ffd700; /* Gold */
+            --accent-color: #b026ff; /* Purple */
+            --error-color: #ff3860;
+            --success-color: #00ff9d;
+            --glass: rgba(255, 255, 255, 0.05);
+            --key-color: rgba(255,255,255,0.08);
+            --active-diff-color: #00ccff;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-color);
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)),
+                repeating-linear-gradient(0deg, transparent 0, transparent 1px, #b026ff15 1px, #b026ff15 2px),
+                radial-gradient(circle at center, #1a0b2e 0%, #000 100%);
+            background-size: 100% 100%, 100% 4px, 100% 100%;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', 'Roboto', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* UI Containers */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            height: 100vh; 
+            justify-content: center;
+        }
+
+        .active { display: flex; }
+
+        h1 { 
+            color: var(--primary-color); 
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            font-style: italic;
+            letter-spacing: -2px;
+        }
+        
+        .subtitle {
+            color: var(--accent-color);
+            letter-spacing: 6px;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Difficulty Selector */
+        .difficulty-section {
+            width: 100%;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        
+        .diff-label { font-size: 0.9rem; color: #888; margin-bottom: 10px; text-align: left; letter-spacing: 1px;}
+        
+        .diff-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .diff-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: #888;
+            padding: 10px 5px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .diff-btn.selected {
+            background: var(--active-diff-color);
+            border-color: var(--active-diff-color);
+            color: #000;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.4);
+        }
+
+        /* Mode Selection Buttons */
+        .mode-select {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        /* Game Display */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            color: #aaa;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+            position: relative;
+        }
+
+        .display-area {
+            height: 100px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .big-text {
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            position: absolute;
+            width: 100%;
+            text-align: center;
+        }
+
+        .countdown { color: var(--accent-color); animation: pulse 0.5s infinite alternate; }
+        
+        .target-number { 
+            color: #fff; 
+            text-shadow: 0 0 30px #fff; 
+            display: none; 
+            z-index: 5;
+        }
+        
+        .reveal-answer {
+            color: var(--success-color);
+            text-shadow: 0 0 20px var(--success-color);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+        .reveal-label { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; }
+        #reveal-text { font-size: 3rem; }
+
+        /* Input Slots */
+        .input-slots {
+            display: flex;
+            gap: 4px; /* Reduced gap slightly */
+            margin-bottom: 15px;
+            justify-content: center;
+            height: 60px;
+            align-items: center;
+        }
+
+        .slot {
+            width: 40px;
+            height: 60px;
+            background: var(--glass);
+            border: 1px solid #444;
+            border-radius: 4px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .slot.active { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(212, 175, 55, 0.3); transform: translateY(-2px); }
+        .slot.correct { background: rgba(0, 255, 157, 0.1); border-color: var(--success-color); color: var(--success-color); }
+        .slot.wrong { background: rgba(255, 56, 96, 0.1); border-color: var(--error-color); color: var(--error-color); }
+        .slot[data-type="letter"] { border-color: #666; color: var(--primary-color); }
+
+        /* Visual Separator for Plate Mode */
+        .separator {
+            font-size: 2rem;
+            color: #666;
+            font-weight: bold;
+            margin: 0 2px;
+            padding-bottom: 5px;
+        }
+
+        /* Keypad Container */
+        .keypad {
+            display: grid;
+            gap: 5px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        
+        .keypad.disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            filter: grayscale(0.5);
+        }
+
+        .keypad.num-mode { grid-template-columns: repeat(3, 1fr); }
+        .keypad.alpha-mode { grid-template-columns: repeat(6, 1fr); }
+
+        button {
+            background: var(--key-color);
+            border: 1px solid #333;
+            color: white;
+            padding: 12px;
+            font-size: 1.3rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .keypad.alpha-mode button { padding: 8px 2px; font-size: 1.1rem; }
+        button:active { transform: scale(0.95); background: #333; }
+        
+        button.start-btn { 
+            width: 100%; 
+            padding: 18px; 
+            font-size: 1.3rem; 
+            background: linear-gradient(90deg, #333, #444);
+            border: 1px solid #555;
+            color: #fff; 
+            font-weight: bold; 
+            margin-top: 5px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        button.primary-btn {
+            background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+            color: #000;
+            border: none;
+            box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+        }
+
+        button.delete-btn { color: var(--error-color); border-color: #522; font-weight: bold; }
+        .keypad.alpha-mode .delete-btn { grid-column: span 2; }
+
+        /* Top Right Controls */
+        .top-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .control-btn {
+            background: none;
+            border: 1px solid #444;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            color: #666;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* Home Button in Game Screen */
+        .home-btn {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 5px 10px;
+            font-size: 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .home-btn:hover { color: #fff; border-color: #fff; }
+
+        @keyframes pulse { 0% { opacity: 0.7; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1.05); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+        .result-title { font-size: 2.5rem; margin: 10px 0; font-weight: bold; }
+        #comment { color: #888; font-style: italic; margin-bottom: 20px; min-height: 1.5em; max-width: 80%; line-height: 1.5; }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-controls">
+        <button class="control-btn" onclick="toggleMute()" id="mute-btn">MUSIC: ON</button>
+    </div>
+
+    <div id="start-screen" class="screen active">
+        <h1>FLASH MIND</h1>
+        <div class="subtitle">NEURAL LINK</div>
+        
+        <div class="difficulty-section">
+            <div class="diff-label">STEP 1: 選擇神經連結強度 (難度)</div>
+            <div class="diff-buttons">
+                <button class="diff-btn" onclick="setDifficulty('easy', this)">簡單<br><span style="font-size:0.7em">1.0s</span></button>
+                <button class="diff-btn selected" onclick="setDifficulty('normal', this)">一般<br><span style="font-size:0.7em">0.5s</span></button>
+                <button class="diff-btn" onclick="setDifficulty('hard', this)">困難<br><span style="font-size:0.7em">0.3s</span></button>
+                <button class="diff-btn" onclick="setDifficulty('hell', this)" style="color:#ff3860; border-color:#522;">地獄<br><span style="font-size:0.7em">0.12s</span></button>
+            </div>
+        </div>
+
+        <div class="mode-select">
+            <div class="diff-label" style="margin-bottom:0">STEP 2: 選擇通訊協定 (模式)</div>
+            <button class="start-btn" onclick="game.init('standard')">標準模式 (6 位數字)</button>
+            <button class="start-btn primary-btn" onclick="game.init('plate')">車牌模式 (字母+數字)</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="status-bar">
+            <div style="display:flex; align-items:center;">
+                <button class="home-btn" onclick="game.home()" title="返回主畫面">🏠</button>
+                <span id="mode-display" style="font-size: 0.9rem;">MODE</span>
+            </div>
+            <div style="text-align:right;">
+                <div id="round-display" style="font-size:0.9rem; color:#666;">Round 1/10</div>
+                <div id="score-display">Score: 0</div>
+            </div>
+        </div>
+
+        <div class="display-area">
+            <div id="countdown" class="big-text countdown"></div>
+            <div id="target-number" class="big-text target-number"></div>
+            <div id="reveal-answer" class="big-text reveal-answer">
+                <div class="reveal-label">CORRECT ANSWER</div>
+                <div id="reveal-text"></div>
+            </div>
+        </div>
+
+        <div class="input-slots" id="input-slots"></div>
+
+        <div class="keypad disabled" id="keypad"></div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <div style="color: #666; font-size: 0.9rem; letter-spacing: 3px;">SESSION COMPLETED</div>
+        <div class="result-title" id="rank-title"></div>
+        <div class="final-score" id="final-score-text" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px;"></div>
+        <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px;">難度: <span id="final-diff"></span></div>
+        <div id="comment"></div>
+        <button class="start-btn" onclick="game.home()">返回主選單</button>
+    </div>
+
+    <script>
+        // --- Difficulty Logic ---
+        let currentDifficulty = 'normal';
+        const difficulties = {
+            'easy': { time: 1000, label: '簡單 (1.0s)' },
+            'normal': { time: 500, label: '一般 (0.5s)' },
+            'hard': { time: 300, label: '困難 (0.3s)' },
+            'hell': { time: 120, label: '地獄 (0.12s)' }
+        };
+
+        function setDifficulty(level, btn) {
+            currentDifficulty = level;
+            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        }
+
+        // --- Web Audio BGM ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let isMuted = false;
+
+        const bgm = {
+            isPlaying: false,
+            tempo: 135,
+            nextNoteTime: 0,
+            timerID: null,
+            beatCount: 0,
+            
+            start: function() {
+                if (this.isPlaying) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                this.isPlaying = true;
+                this.beatCount = 0;
+                this.nextNoteTime = audioCtx.currentTime;
+                this.scheduler();
+            },
+            stop: function() { this.isPlaying = false; clearTimeout(this.timerID); },
+            scheduler: function() {
+                while (this.nextNoteTime < audioCtx.currentTime + 0.1) {
+                    this.playBeat(this.nextNoteTime, this.beatCount);
+                    this.advanceNote();
+                }
+                if (this.isPlaying) this.timerID = setTimeout(() => this.scheduler(), 25);
+            },
+            advanceNote: function() {
+                const secondsPerBeat = 60.0 / this.tempo;
+                this.nextNoteTime += 0.25 * secondsPerBeat;
+                this.beatCount++;
+                if (this.beatCount === 16) this.beatCount = 0;
+            },
+            playBeat: function(time, step) {
+                if (isMuted) return;
+                // Bass
+                if (step % 2 === 0) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    const freq = (step === 0 || step === 8) ? 55 : (step === 4 ? 65.41 : 49); 
+                    osc.frequency.setValueAtTime(freq, time);
+                    osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0.15, time);
+                    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
+                    osc.start(time);
+                    osc.stop(time + 0.15);
+                }
+                // Kick
+                if (step % 4 === 0) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(150, time);
+                    osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
+                    gain.gain.setValueAtTime(0.4, time);
+                    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+                    osc.start(time);
+                    osc.stop(time + 0.5);
+                }
+            }
+        };
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('mute-btn');
+            btn.innerText = isMuted ? "MUSIC: OFF" : "MUSIC: ON";
+            btn.style.color = isMuted ? "#666" : "#fff";
+        }
+
+        const playSFX = (type) => {
+            if (isMuted) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'tick') {
+                osc.frequency.setValueAtTime(800, now);
+                osc.type = 'square';
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'flash') {
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(2000, now + 0.1);
+                osc.type = 'triangle';
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'input') {
+                osc.frequency.setValueAtTime(1200, now);
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            } else if (type === 'correct') {
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.setValueAtTime(1200, now + 0.1);
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.5);
+                osc.type = 'sawtooth';
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            }
+        };
+
+        // --- Game Logic ---
+        const game = {
+            totalRounds: 10,
+            currentRound: 0,
+            score: 0,
+            target: "",
+            userInput: "",
+            state: "idle",
+            digitCount: 6,
+            flashDuration: 500,
+            mode: 'standard', 
+            countdownInterval: null,
+
+            init: function(selectedMode) {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                bgm.start();
+
+                this.mode = selectedMode;
+                this.flashDuration = difficulties[currentDifficulty].time;
+
+                document.getElementById('start-screen').classList.remove('active');
+                document.getElementById('result-screen').classList.remove('active');
+                document.getElementById('game-screen').classList.add('active');
+                
+                const modeName = this.mode === 'plate' ? "PLATE" : "STANDARD";
+                document.getElementById('mode-display').innerText = `${modeName} | ${difficulties[currentDifficulty].label.split(' ')[0]}`;
+                document.getElementById('mode-display').style.color = this.mode === 'plate' ? "var(--primary-color)" : "#ccc";
+
+                this.initSlotsHTML();
+                this.currentRound = 0;
+                this.score = 0;
+                this.startRound();
+            },
+
+            // New Home Function
+            home: function() {
+                // Clear any running timers
+                clearInterval(this.countdownInterval);
+                bgm.stop();
+                
+                // Reset State
+                this.state = "idle";
+                this.userInput = "";
+                
+                // UI Switch
+                document.getElementById('game-screen').classList.remove('active');
+                document.getElementById('result-screen').classList.remove('active');
+                document.getElementById('start-screen').classList.add('active');
+            },
+
+            initSlotsHTML: function() {
+                const container = document.getElementById('input-slots');
+                container.innerHTML = '';
+                for(let i=0; i<6; i++) {
+                    // In plate mode, insert a visual hyphen before the 3rd slot (index 2)
+                    if(this.mode === 'plate' && i === 2) {
+                        const sep = document.createElement('div');
+                        sep.className = 'separator';
+                        sep.innerText = '-';
+                        container.appendChild(sep);
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'slot';
+                    if(this.mode === 'plate' && i < 2) div.setAttribute('data-type', 'letter');
+                    container.appendChild(div);
+                }
+            },
+
+            startRound: function() {
+                if (this.currentRound >= this.totalRounds) {
+                    this.endGame();
+                    return;
+                }
+                
+                this.currentRound++;
+                
+                // Target Gen
+                if (this.mode === 'standard') {
+                    this.target = Math.floor(100000 + Math.random() * 900000).toString();
+                } else {
+                    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    const char1 = letters.charAt(Math.floor(Math.random() * 26));
+                    const char2 = letters.charAt(Math.floor(Math.random() * 26));
+                    const nums = Math.floor(1000 + Math.random() * 9000).toString();
+                    this.target = char1 + char2 + nums; // Raw data: AB1234
+                }
+
+                this.userInput = "";
+                this.state = "counting";
+                
+                this.updateUI();
+                this.resetSlots();
+                this.resetDisplayArea();
+                
+                this.renderKeypad(); 
+                document.getElementById('keypad').classList.add('disabled');
+                
+                this.runCountdown(3); // Reduced to 3s for faster pace
+            },
+
+            updateUI: function() {
+                document.getElementById('round-display').innerText = `Round ${this.currentRound}/${this.totalRounds}`;
+                document.getElementById('score-display').innerText = `Score: ${this.score}`;
+            },
+
+            resetSlots: function() {
+                const slots = document.querySelectorAll('.slot');
+                slots.forEach(slot => {
+                    slot.innerText = "";
+                    slot.className = 'slot';
+                    if(this.mode === 'plate' && Array.from(slots).indexOf(slot) < 2) {
+                        slot.setAttribute('data-type', 'letter');
+                    }
+                });
+            },
+
+            resetDisplayArea: function() {
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('target-number').style.display = 'none';
+                document.getElementById('reveal-answer').style.display = 'none';
+            },
+
+            runCountdown: function(seconds) {
+                const cdEl = document.getElementById('countdown');
+                cdEl.style.display = 'block';
+                
+                let count = seconds;
+                cdEl.innerText = count;
+                playSFX('tick');
+
+                clearInterval(this.countdownInterval);
+                this.countdownInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        cdEl.innerText = count;
+                        playSFX('tick');
+                    } else {
+                        clearInterval(this.countdownInterval);
+                        this.flashNumber();
+                    }
+                }, 1000);
+            },
+
+            flashNumber: function() {
+                const cdEl = document.getElementById('countdown');
+                const targetEl = document.getElementById('target-number');
+                
+                cdEl.style.display = 'none';
+                targetEl.style.display = 'block';
+                
+                // Format display for Plate Mode (Add Hyphen)
+                if (this.mode === 'plate') {
+                    targetEl.innerText = this.target.slice(0, 2) + '-' + this.target.slice(2);
+                } else {
+                    targetEl.innerText = this.target;
+                }
+                
+                playSFX('flash');
+
+                setTimeout(() => {
+                    targetEl.style.display = 'none';
+                    this.enableInput();
+                }, this.flashDuration); 
+            },
+
+            enableInput: function() {
+                this.state = "input";
+                document.getElementById('keypad').classList.remove('disabled');
+                this.renderKeypad(); 
+                this.highlightCurrentSlot();
+            },
+
+            renderKeypad: function() {
+                const keypadEl = document.getElementById('keypad');
+                keypadEl.innerHTML = '';
+                
+                let showLetters = false;
+                if (this.mode === 'standard') {
+                    showLetters = false;
+                } else if (this.mode === 'plate') {
+                    if (this.userInput.length < 2) showLetters = true;
+                    else showLetters = false;
+                }
+
+                if (showLetters) {
+                    keypadEl.className = this.state === 'counting' ? 'keypad alpha-mode disabled' : 'keypad alpha-mode';
+                    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                    for (let i = 0; i < chars.length; i++) {
+                        const btn = document.createElement('button');
+                        btn.innerText = chars[i];
+                        btn.onclick = () => this.input(chars[i]);
+                        keypadEl.appendChild(btn);
+                    }
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-btn';
+                    delBtn.innerText = '⌫';
+                    delBtn.onclick = () => this.delete();
+                    keypadEl.appendChild(delBtn);
+
+                } else {
+                    keypadEl.className = this.state === 'counting' ? 'keypad num-mode disabled' : 'keypad num-mode';
+                    for (let i = 1; i <= 9; i++) {
+                        const btn = document.createElement('button');
+                        btn.innerText = i;
+                        btn.onclick = () => this.input(i.toString());
+                        keypadEl.appendChild(btn);
+                    }
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'delete-btn';
+                    delBtn.innerText = '⌫';
+                    delBtn.onclick = () => this.delete();
+                    keypadEl.appendChild(delBtn);
+
+                    const zeroBtn = document.createElement('button');
+                    zeroBtn.innerText = '0';
+                    zeroBtn.onclick = () => this.input('0');
+                    keypadEl.appendChild(zeroBtn);
+                    
+                    const emptyBtn = document.createElement('button');
+                    emptyBtn.style.visibility = 'hidden';
+                    keypadEl.appendChild(emptyBtn);
+                }
+            },
+
+            input: function(char) {
+                if (this.state !== "input" || this.userInput.length >= this.digitCount) return;
+                
+                playSFX('input');
+                this.userInput += char;
+                this.updateSlots();
+                this.renderKeypad(); 
+                
+                if (this.userInput.length === this.digitCount) {
+                    setTimeout(() => this.checkAnswer(), 150);
+                }
+            },
+
+            delete: function() {
+                if (this.state !== "input" || this.userInput.length === 0) return;
+                this.userInput = this.userInput.slice(0, -1);
+                playSFX('input');
+                this.updateSlots();
+                this.renderKeypad(); 
+            },
+
+            updateSlots: function() {
+                const slots = document.querySelectorAll('.slot');
+                slots.forEach((slot, index) => {
+                    slot.innerText = this.userInput[index] || "";
+                    slot.classList.remove('active');
+                });
+                this.highlightCurrentSlot();
+            },
+
+            highlightCurrentSlot: function() {
+                if (this.userInput.length < this.digitCount) {
+                    document.querySelectorAll('.slot')[this.userInput.length].classList.add('active');
+                }
+            },
+
+            checkAnswer: function() {
+                this.state = "checking";
+                const slots = document.querySelectorAll('.slot');
+                let roundScore = 0;
+
+                document.getElementById('keypad').classList.add('disabled');
+
+                for (let i = 0; i < this.digitCount; i++) {
+                    if (this.userInput[i] === this.target[i]) {
+                        slots[i].classList.add('correct');
+                        roundScore++;
+                    } else {
+                        slots[i].classList.add('wrong');
+                    }
+                }
+
+                if (roundScore === this.digitCount) {
+                    playSFX('correct');
+                    this.score += 10;
+                    setTimeout(() => {
+                        this.startRound();
+                    }, 1000);
+                } else {
+                    playSFX('wrong');
+                    this.showCorrectAnswer();
+                }
+            },
+
+            showCorrectAnswer: function() {
+                const revealEl = document.getElementById('reveal-answer');
+                const revealText = document.getElementById('reveal-text');
+                
+                document.getElementById('countdown').style.display = 'none';
+                revealEl.style.display = 'flex';
+                
+                // Format reveal text with hyphen if plate mode
+                if (this.mode === 'plate') {
+                    revealText.innerText = this.target.slice(0, 2) + '-' + this.target.slice(2);
+                } else {
+                    revealText.innerText = this.target;
+                }
+
+                setTimeout(() => {
+                    this.startRound();
+                }, 2000);
+            },
+
+            endGame: function() {
+                bgm.stop();
+                document.getElementById('game-screen').classList.remove('active');
+                document.getElementById('result-screen').classList.add('active');
+                
+                document.getElementById('final-diff').innerText = difficulties[currentDifficulty].label;
+
+                const finalScore = this.score;
+                let title = "";
+                let color = "";
+                let comment = "";
+
+                if (finalScore === 100) { 
+                    title = "LEGEND (傳說)"; 
+                    color = "#ffd700"; 
+                    comment = "完美無缺。你的大腦已進化。";
+                }
+                else if (finalScore >= 80) { 
+                    title = "ELITE (菁英)"; 
+                    color = "#00ff9d"; 
+                    comment = "反應驚人，處理器等級：Core i9。";
+                }
+                else if (finalScore >= 50) { 
+                    title = "PASS (合格)"; 
+                    color = "#00ccff"; 
+                    comment = "還不錯，請繼續挑戰更高難度。";
+                }
+                else { 
+                    title = "FAIL (失敗)"; 
+                    color = "#ff3860"; 
+                    comment = "系統偵測到認知超載，請多休息。";
+                }
+
+                document.getElementById('final-score-text').innerText = `SCORE: ${finalScore}`;
+                const rankEl = document.getElementById('rank-title');
+                rankEl.innerText = title;
+                rankEl.style.color = color;
+                document.getElementById('comment').innerText = comment;
+                
+                if(finalScore >= 50) playSFX('correct');
+                else playSFX('wrong');
+            }
+        };
+    </script>
+</body>
+</html>
