@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash Mind: Ultimate Rev2</title>
+    <title>Flash Mind: Ultimate Rev3</title>
     <style>
         :root {
             --bg-color: #050010;
@@ -55,7 +55,7 @@
 
         h1 { 
             color: var(--primary-color); 
-            font-size: 3rem;
+            font-size: 2.8rem;
             margin: 0;
             text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
             font-style: italic;
@@ -65,8 +65,8 @@
         .subtitle {
             color: var(--accent-color);
             letter-spacing: 6px;
-            font-size: 1rem;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
             text-transform: uppercase;
             font-weight: bold;
         }
@@ -74,11 +74,12 @@
         /* Difficulty Selector */
         .difficulty-section {
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             background: rgba(255,255,255,0.03);
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #333;
+            box-sizing: border-box;
         }
         
         .diff-label { font-size: 0.9rem; color: #888; margin-bottom: 10px; text-align: left; letter-spacing: 1px;}
@@ -93,7 +94,7 @@
             background: transparent;
             border: 1px solid #555;
             color: #888;
-            padding: 10px 5px;
+            padding: 10px 2px;
             font-size: 0.9rem;
             border-radius: 4px;
             cursor: pointer;
@@ -112,8 +113,14 @@
         .mode-select {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
             width: 100%;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         /* Game Display */
@@ -145,7 +152,7 @@
         }
 
         .big-text {
-            font-size: 4rem;
+            font-size: 3.5rem;
             font-weight: 900;
             font-family: 'Courier New', monospace;
             letter-spacing: 2px;
@@ -154,7 +161,7 @@
             text-align: center;
         }
 
-        .countdown { color: var(--accent-color); animation: pulse 0.5s infinite alternate; }
+        .countdown { color: var(--accent-color); animation: pulse 0.5s infinite alternate; font-size: 4rem;}
         
         .target-number { 
             color: #fff; 
@@ -177,20 +184,21 @@
         /* Input Slots */
         .input-slots {
             display: flex;
-            gap: 4px; /* Reduced gap slightly */
+            gap: 4px;
             margin-bottom: 15px;
             justify-content: center;
-            height: 60px;
+            height: 55px;
             align-items: center;
+            width: 100%;
         }
 
         .slot {
-            width: 40px;
-            height: 60px;
+            width: 38px;
+            height: 55px;
             background: var(--glass);
             border: 1px solid #444;
             border-radius: 4px;
-            font-size: 2rem;
+            font-size: 1.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -204,12 +212,11 @@
         .slot.wrong { background: rgba(255, 56, 96, 0.1); border-color: var(--error-color); color: var(--error-color); }
         .slot[data-type="letter"] { border-color: #666; color: var(--primary-color); }
 
-        /* Visual Separator for Plate Mode */
         .separator {
             font-size: 2rem;
             color: #666;
             font-weight: bold;
-            margin: 0 2px;
+            margin: 0 1px;
             padding-bottom: 5px;
         }
 
@@ -246,13 +253,12 @@
         
         button.start-btn { 
             width: 100%; 
-            padding: 18px; 
-            font-size: 1.3rem; 
+            padding: 15px; 
+            font-size: 1.2rem; 
             background: linear-gradient(90deg, #333, #444);
             border: 1px solid #555;
             color: #fff; 
             font-weight: bold; 
-            margin-top: 5px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
         
@@ -260,7 +266,15 @@
             background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
             color: #000;
             border: none;
-            box-shadow: 0 0 20px rgba(176, 38, 255, 0.3);
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.2);
+        }
+        
+        button.brawl-btn {
+            background: linear-gradient(135deg, #ff3860, #b026ff);
+            color: #fff;
+            border: none;
+            box-shadow: 0 0 15px rgba(255, 56, 96, 0.4);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         button.delete-btn { color: var(--error-color); border-color: #522; font-weight: bold; }
@@ -286,7 +300,6 @@
             cursor: pointer;
         }
 
-        /* Home Button in Game Screen */
         .home-btn {
             background: transparent;
             border: 1px solid #444;
@@ -304,6 +317,8 @@
 
         .result-title { font-size: 2.5rem; margin: 10px 0; font-weight: bold; }
         #comment { color: #888; font-style: italic; margin-bottom: 20px; min-height: 1.5em; max-width: 80%; line-height: 1.5; }
+        
+        .small-desc { display: block; font-size: 0.8rem; font-weight: normal; opacity: 0.8; margin-top: 2px;}
 
     </style>
 </head>
@@ -318,7 +333,7 @@
         <div class="subtitle">NEURAL LINK</div>
         
         <div class="difficulty-section">
-            <div class="diff-label">STEP 1: 選擇神經連結強度 (難度)</div>
+            <div class="diff-label">STEP 1: 神經連結強度 (難度)</div>
             <div class="diff-buttons">
                 <button class="diff-btn" onclick="setDifficulty('easy', this)">簡單<br><span style="font-size:0.7em">1.0s</span></button>
                 <button class="diff-btn selected" onclick="setDifficulty('normal', this)">一般<br><span style="font-size:0.7em">0.5s</span></button>
@@ -328,9 +343,15 @@
         </div>
 
         <div class="mode-select">
-            <div class="diff-label" style="margin-bottom:0">STEP 2: 選擇通訊協定 (模式)</div>
-            <button class="start-btn" onclick="game.init('standard')">標準模式 (6 位數字)</button>
-            <button class="start-btn primary-btn" onclick="game.init('plate')">車牌模式 (字母+數字)</button>
+            <div class="diff-label" style="margin-bottom:0">STEP 2: 通訊協定 (模式)</div>
+            <button class="start-btn" onclick="game.init('standard')">標準數字 <span class="small-desc">6碼純數字</span></button>
+            
+            <div class="mode-grid">
+                <button class="start-btn primary-btn" onclick="game.init('old_car')">舊款汽車 <span class="small-desc">2英 + 4數</span></button>
+                <button class="start-btn primary-btn" onclick="game.init('new_car')">新款汽車 <span class="small-desc">3英 + 4數</span></button>
+                <button class="start-btn primary-btn" onclick="game.init('motorcycle')">一般機車 <span class="small-desc">3英 + 3數</span></button>
+                <button class="start-btn brawl-btn" onclick="game.init('brawl')">大亂鬥 <span class="small-desc">隨機車牌切換</span></button>
+            </div>
         </div>
     </div>
 
@@ -338,11 +359,11 @@
         <div class="status-bar">
             <div style="display:flex; align-items:center;">
                 <button class="home-btn" onclick="game.home()" title="返回主畫面">🏠</button>
-                <span id="mode-display" style="font-size: 0.9rem;">MODE</span>
+                <span id="mode-display" style="font-size: 0.9rem; font-weight: bold;">MODE</span>
             </div>
             <div style="text-align:right;">
                 <div id="round-display" style="font-size:0.9rem; color:#666;">Round 1/10</div>
-                <div id="score-display">Score: 0</div>
+                <div id="score-display" style="color:var(--primary-color);">Score: 0</div>
             </div>
         </div>
 
@@ -364,19 +385,19 @@
         <div style="color: #666; font-size: 0.9rem; letter-spacing: 3px;">SESSION COMPLETED</div>
         <div class="result-title" id="rank-title"></div>
         <div class="final-score" id="final-score-text" style="font-size: 1.5rem; color: #fff; margin-bottom: 10px;"></div>
-        <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px;">難度: <span id="final-diff"></span></div>
+        <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px;">難度: <span id="final-diff"></span> | 模式: <span id="final-mode"></span></div>
         <div id="comment"></div>
-        <button class="start-btn" onclick="game.home()">返回主選單</button>
+        <button class="start-btn brawl-btn" style="margin-top: 10px;" onclick="game.home()">返回主選單</button>
     </div>
 
     <script>
         // --- Difficulty Logic ---
         let currentDifficulty = 'normal';
         const difficulties = {
-            'easy': { time: 1000, label: '簡單 (1.0s)' },
-            'normal': { time: 500, label: '一般 (0.5s)' },
-            'hard': { time: 300, label: '困難 (0.3s)' },
-            'hell': { time: 120, label: '地獄 (0.12s)' }
+            'easy': { time: 1000, label: '簡單' },
+            'normal': { time: 500, label: '一般' },
+            'hard': { time: 300, label: '困難' },
+            'hell': { time: 120, label: '地獄' }
         };
 
         function setDifficulty(level, btn) {
@@ -390,17 +411,11 @@
         let isMuted = false;
 
         const bgm = {
-            isPlaying: false,
-            tempo: 135,
-            nextNoteTime: 0,
-            timerID: null,
-            beatCount: 0,
-            
+            isPlaying: false, tempo: 135, nextNoteTime: 0, timerID: null, beatCount: 0,
             start: function() {
                 if (this.isPlaying) return;
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-                this.isPlaying = true;
-                this.beatCount = 0;
+                this.isPlaying = true; this.beatCount = 0;
                 this.nextNoteTime = audioCtx.currentTime;
                 this.scheduler();
             },
@@ -420,32 +435,20 @@
             },
             playBeat: function(time, step) {
                 if (isMuted) return;
-                // Bass
                 if (step % 2 === 0) {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
                     const freq = (step === 0 || step === 8) ? 55 : (step === 4 ? 65.41 : 49); 
-                    osc.frequency.setValueAtTime(freq, time);
-                    osc.type = 'sawtooth';
-                    gain.gain.setValueAtTime(0.15, time);
-                    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
-                    osc.start(time);
-                    osc.stop(time + 0.15);
+                    osc.frequency.setValueAtTime(freq, time); osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(0.15, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
+                    osc.start(time); osc.stop(time + 0.15);
                 }
-                // Kick
                 if (step % 4 === 0) {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.frequency.setValueAtTime(150, time);
-                    osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
-                    gain.gain.setValueAtTime(0.4, time);
-                    gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
-                    osc.start(time);
-                    osc.stop(time + 0.5);
+                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+                    osc.connect(gain); gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(150, time); osc.frequency.exponentialRampToValueAtTime(0.01, time + 0.5);
+                    gain.gain.setValueAtTime(0.4, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.5);
+                    osc.start(time); osc.stop(time + 0.5);
                 }
             }
         };
@@ -460,64 +463,48 @@
         const playSFX = (type) => {
             if (isMuted) return;
             const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
 
             if (type === 'tick') {
-                osc.frequency.setValueAtTime(800, now);
-                osc.type = 'square';
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
+                osc.frequency.setValueAtTime(800, now); osc.type = 'square';
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             } else if (type === 'flash') {
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.linearRampToValueAtTime(2000, now + 0.1);
-                osc.type = 'triangle';
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
+                osc.frequency.setValueAtTime(100, now); osc.frequency.linearRampToValueAtTime(2000, now + 0.1);
+                osc.type = 'triangle'; gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'input') {
-                osc.frequency.setValueAtTime(1200, now);
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.05, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-                osc.start(now);
-                osc.stop(now + 0.05);
+                osc.frequency.setValueAtTime(1200, now); osc.type = 'sine';
+                gain.gain.setValueAtTime(0.05, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now); osc.stop(now + 0.05);
             } else if (type === 'correct') {
-                osc.frequency.setValueAtTime(600, now);
-                osc.frequency.setValueAtTime(1200, now + 0.1);
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+                osc.frequency.setValueAtTime(600, now); osc.frequency.setValueAtTime(1200, now + 0.1);
+                osc.type = 'sine'; gain.gain.setValueAtTime(0.2, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             } else if (type === 'wrong') {
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(50, now + 0.5);
-                osc.type = 'sawtooth';
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now);
-                osc.stop(now + 0.5);
+                osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(50, now + 0.5);
+                osc.type = 'sawtooth'; gain.gain.setValueAtTime(0.3, now); gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
             }
         };
 
         // --- Game Logic ---
         const game = {
-            totalRounds: 10,
-            currentRound: 0,
-            score: 0,
-            target: "",
-            userInput: "",
-            state: "idle",
-            digitCount: 6,
-            flashDuration: 500,
-            mode: 'standard', 
-            countdownInterval: null,
+            totalRounds: 10, currentRound: 0, score: 0,
+            target: "", userInput: "", state: "idle",
+            mode: 'standard', // 'standard', 'old_car', 'new_car', 'motorcycle', 'brawl'
+            currentFormat: 'standard', 
+            digitCount: 6, letterCount: 0,
+            flashDuration: 500, countdownInterval: null,
+
+            modeDetails: {
+                'standard': { name: 'STANDARD', color: '#ccc' },
+                'old_car': { name: 'OLD CAR', color: '#ffd700' },
+                'new_car': { name: 'NEW CAR', color: '#00ff9d' },
+                'motorcycle': { name: 'MOTO', color: '#00ccff' },
+                'brawl': { name: 'BRAWL', color: '#ff3860' }
+            },
 
             init: function(selectedMode) {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -530,38 +517,89 @@
                 document.getElementById('result-screen').classList.remove('active');
                 document.getElementById('game-screen').classList.add('active');
                 
-                const modeName = this.mode === 'plate' ? "PLATE" : "STANDARD";
-                document.getElementById('mode-display').innerText = `${modeName} | ${difficulties[currentDifficulty].label.split(' ')[0]}`;
-                document.getElementById('mode-display').style.color = this.mode === 'plate' ? "var(--primary-color)" : "#ccc";
+                const details = this.modeDetails[this.mode];
+                document.getElementById('mode-display').innerText = `${details.name} | ${difficulties[currentDifficulty].label}`;
+                document.getElementById('mode-display').style.color = details.color;
 
-                this.initSlotsHTML();
                 this.currentRound = 0;
                 this.score = 0;
                 this.startRound();
             },
 
-            // New Home Function
             home: function() {
-                // Clear any running timers
                 clearInterval(this.countdownInterval);
                 bgm.stop();
-                
-                // Reset State
                 this.state = "idle";
                 this.userInput = "";
-                
-                // UI Switch
                 document.getElementById('game-screen').classList.remove('active');
                 document.getElementById('result-screen').classList.remove('active');
                 document.getElementById('start-screen').classList.add('active');
             },
 
+            startRound: function() {
+                if (this.currentRound >= this.totalRounds) {
+                    this.endGame(); return;
+                }
+                
+                this.currentRound++;
+                
+                // Determine format for this round
+                if (this.mode === 'brawl') {
+                    const plateModes = ['old_car', 'new_car', 'motorcycle'];
+                    this.currentFormat = plateModes[Math.floor(Math.random() * plateModes.length)];
+                } else {
+                    this.currentFormat = this.mode;
+                }
+
+                // Set rules based on current format
+                if (this.currentFormat === 'standard') {
+                    this.digitCount = 6; this.letterCount = 0;
+                } else if (this.currentFormat === 'old_car') {
+                    this.digitCount = 6; this.letterCount = 2; // 2L + 4N
+                } else if (this.currentFormat === 'motorcycle') {
+                    this.digitCount = 6; this.letterCount = 3; // 3L + 3N
+                } else if (this.currentFormat === 'new_car') {
+                    this.digitCount = 7; this.letterCount = 3; // 3L + 4N
+                }
+
+                this.generateTarget();
+                this.initSlotsHTML(); // Render slots dynamically for this round
+                this.userInput = "";
+                this.state = "counting";
+                
+                this.updateUI();
+                this.resetDisplayArea();
+                
+                this.renderKeypad(); 
+                document.getElementById('keypad').classList.add('disabled');
+                
+                this.runCountdown(3); 
+            },
+
+            generateTarget: function() {
+                const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                let t = "";
+                if (this.currentFormat === 'standard') {
+                    for(let i=0; i<6; i++) t += Math.floor(Math.random() * 10);
+                } else {
+                    for(let i=0; i<this.letterCount; i++) t += chars.charAt(Math.floor(Math.random() * 26));
+                    const numCount = this.digitCount - this.letterCount;
+                    for(let i=0; i<numCount; i++) t += Math.floor(Math.random() * 10);
+                }
+                this.target = t;
+            },
+
+            formatDisplayString: function(str) {
+                if (this.currentFormat === 'standard') return str;
+                return str.slice(0, this.letterCount) + '-' + str.slice(this.letterCount);
+            },
+
             initSlotsHTML: function() {
                 const container = document.getElementById('input-slots');
                 container.innerHTML = '';
-                for(let i=0; i<6; i++) {
-                    // In plate mode, insert a visual hyphen before the 3rd slot (index 2)
-                    if(this.mode === 'plate' && i === 2) {
+                for(let i=0; i < this.digitCount; i++) {
+                    // Insert hyphen before the first number in plate modes
+                    if(this.currentFormat !== 'standard' && i === this.letterCount) {
                         const sep = document.createElement('div');
                         sep.className = 'separator';
                         sep.innerText = '-';
@@ -570,57 +608,14 @@
 
                     const div = document.createElement('div');
                     div.className = 'slot';
-                    if(this.mode === 'plate' && i < 2) div.setAttribute('data-type', 'letter');
+                    if(i < this.letterCount) div.setAttribute('data-type', 'letter');
                     container.appendChild(div);
                 }
-            },
-
-            startRound: function() {
-                if (this.currentRound >= this.totalRounds) {
-                    this.endGame();
-                    return;
-                }
-                
-                this.currentRound++;
-                
-                // Target Gen
-                if (this.mode === 'standard') {
-                    this.target = Math.floor(100000 + Math.random() * 900000).toString();
-                } else {
-                    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                    const char1 = letters.charAt(Math.floor(Math.random() * 26));
-                    const char2 = letters.charAt(Math.floor(Math.random() * 26));
-                    const nums = Math.floor(1000 + Math.random() * 9000).toString();
-                    this.target = char1 + char2 + nums; // Raw data: AB1234
-                }
-
-                this.userInput = "";
-                this.state = "counting";
-                
-                this.updateUI();
-                this.resetSlots();
-                this.resetDisplayArea();
-                
-                this.renderKeypad(); 
-                document.getElementById('keypad').classList.add('disabled');
-                
-                this.runCountdown(3); // Reduced to 3s for faster pace
             },
 
             updateUI: function() {
                 document.getElementById('round-display').innerText = `Round ${this.currentRound}/${this.totalRounds}`;
                 document.getElementById('score-display').innerText = `Score: ${this.score}`;
-            },
-
-            resetSlots: function() {
-                const slots = document.querySelectorAll('.slot');
-                slots.forEach(slot => {
-                    slot.innerText = "";
-                    slot.className = 'slot';
-                    if(this.mode === 'plate' && Array.from(slots).indexOf(slot) < 2) {
-                        slot.setAttribute('data-type', 'letter');
-                    }
-                });
             },
 
             resetDisplayArea: function() {
@@ -632,7 +627,6 @@
             runCountdown: function(seconds) {
                 const cdEl = document.getElementById('countdown');
                 cdEl.style.display = 'block';
-                
                 let count = seconds;
                 cdEl.innerText = count;
                 playSFX('tick');
@@ -656,13 +650,7 @@
                 
                 cdEl.style.display = 'none';
                 targetEl.style.display = 'block';
-                
-                // Format display for Plate Mode (Add Hyphen)
-                if (this.mode === 'plate') {
-                    targetEl.innerText = this.target.slice(0, 2) + '-' + this.target.slice(2);
-                } else {
-                    targetEl.innerText = this.target;
-                }
+                targetEl.innerText = this.formatDisplayString(this.target);
                 
                 playSFX('flash');
 
@@ -683,13 +671,7 @@
                 const keypadEl = document.getElementById('keypad');
                 keypadEl.innerHTML = '';
                 
-                let showLetters = false;
-                if (this.mode === 'standard') {
-                    showLetters = false;
-                } else if (this.mode === 'plate') {
-                    if (this.userInput.length < 2) showLetters = true;
-                    else showLetters = false;
-                }
+                let showLetters = (this.userInput.length < this.letterCount);
 
                 if (showLetters) {
                     keypadEl.className = this.state === 'counting' ? 'keypad alpha-mode disabled' : 'keypad alpha-mode';
@@ -786,9 +768,7 @@
                 if (roundScore === this.digitCount) {
                     playSFX('correct');
                     this.score += 10;
-                    setTimeout(() => {
-                        this.startRound();
-                    }, 1000);
+                    setTimeout(() => { this.startRound(); }, 1000);
                 } else {
                     playSFX('wrong');
                     this.showCorrectAnswer();
@@ -801,17 +781,9 @@
                 
                 document.getElementById('countdown').style.display = 'none';
                 revealEl.style.display = 'flex';
-                
-                // Format reveal text with hyphen if plate mode
-                if (this.mode === 'plate') {
-                    revealText.innerText = this.target.slice(0, 2) + '-' + this.target.slice(2);
-                } else {
-                    revealText.innerText = this.target;
-                }
+                revealText.innerText = this.formatDisplayString(this.target);
 
-                setTimeout(() => {
-                    this.startRound();
-                }, 2000);
+                setTimeout(() => { this.startRound(); }, 2000);
             },
 
             endGame: function() {
@@ -820,41 +792,34 @@
                 document.getElementById('result-screen').classList.add('active');
                 
                 document.getElementById('final-diff').innerText = difficulties[currentDifficulty].label;
+                document.getElementById('final-mode').innerText = this.modeDetails[this.mode].name;
 
                 const finalScore = this.score;
-                let title = "";
-                let color = "";
-                let comment = "";
+                let title = "", color = "", comment = "";
 
                 if (finalScore === 100) { 
-                    title = "LEGEND (傳說)"; 
-                    color = "#ffd700"; 
-                    comment = "完美無缺。你的大腦已進化。";
+                    title = "LEGEND (傳說)"; color = "#ffd700"; 
+                    comment = "完美無缺。你的大腦已適應所有載具系統。";
                 }
                 else if (finalScore >= 80) { 
-                    title = "ELITE (菁英)"; 
-                    color = "#00ff9d"; 
+                    title = "ELITE (菁英)"; color = "#00ff9d"; 
                     comment = "反應驚人，處理器等級：Core i9。";
                 }
                 else if (finalScore >= 50) { 
-                    title = "PASS (合格)"; 
-                    color = "#00ccff"; 
+                    title = "PASS (合格)"; color = "#00ccff"; 
                     comment = "還不錯，請繼續挑戰更高難度。";
                 }
                 else { 
-                    title = "FAIL (失敗)"; 
-                    color = "#ff3860"; 
+                    title = "FAIL (失敗)"; color = "#ff3860"; 
                     comment = "系統偵測到認知超載，請多休息。";
                 }
 
                 document.getElementById('final-score-text').innerText = `SCORE: ${finalScore}`;
                 const rankEl = document.getElementById('rank-title');
-                rankEl.innerText = title;
-                rankEl.style.color = color;
+                rankEl.innerText = title; rankEl.style.color = color;
                 document.getElementById('comment').innerText = comment;
                 
-                if(finalScore >= 50) playSFX('correct');
-                else playSFX('wrong');
+                if(finalScore >= 50) playSFX('correct'); else playSFX('wrong');
             }
         };
     </script>
