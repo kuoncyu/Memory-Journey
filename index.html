@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash Mind: Ultimate Rev6</title>
+    <title>Flash Mind: Ultimate Rev7</title>
     <style>
         :root {
             --bg-color: #050010;
@@ -247,11 +247,9 @@
             <div class="modal-title">🧠 認知心理學小實驗室</div>
             <div class="modal-body">
                 <h3>1. 米勒定律 (The Magical Number 7±2)</h3>
-                
                 <p>1956年，心理學家 George A. Miller 提出，人類的「短期記憶」容量非常有限，大腦處理器在不借助其他工具的情況下，大約只能同時記住 <strong>5 到 9 個項目 (7±2)</strong>。一旦超過這個極限，資訊就會開始流失。</p>
                 
                 <h3>2. 組塊記憶 (Chunking)</h3>
-                
                 <p>為了解決認知超載，大腦演化出了「組塊」的能力。這是一種將零散資訊「打包」成有意義群組的技巧。<br>
                 例如：一組 10 碼的手機號碼 <code>0918356443</code> 對大腦來說是 10 個獨立資訊；但加上分隔符號後 <code>0918-356-443</code>，大腦會將其視為 <strong>3 個區塊</strong>，瞬間破解了 7±2 的限制！</p>
                 
@@ -455,15 +453,16 @@
             digitCount: 6, letterCount: 0,
             flashDuration: 500, countdownInterval: null,
 
+            // 極致高對比度 9 色 (移除了容易混淆的粉與棕，換成青與黑)
             colorMap: {
                 '1': { name: '紅', bg: '#ff3b30', text: '#fff' },
                 '2': { name: '橘', bg: '#ff9500', text: '#fff' },
                 '3': { name: '黃', bg: '#ffcc00', text: '#000' },
                 '4': { name: '綠', bg: '#34c759', text: '#000' },
-                '5': { name: '藍', bg: '#007aff', text: '#fff' },
-                '6': { name: '紫', bg: '#af52de', text: '#fff' },
-                '7': { name: '粉', bg: '#ff2d55', text: '#fff' },
-                '8': { name: '棕', bg: '#a2845e', text: '#fff' },
+                '5': { name: '青', bg: '#00ffff', text: '#000' },
+                '6': { name: '藍', bg: '#007aff', text: '#fff' },
+                '7': { name: '紫', bg: '#af52de', text: '#fff' },
+                '8': { name: '黑', bg: '#222222', text: '#fff' },
                 '9': { name: '白', bg: '#ffffff', text: '#000' }
             },
 
@@ -675,7 +674,7 @@
                 setTimeout(() => {
                     targetEl.style.display = 'none';
                     this.enableInput();
-                    this.updateSlots(); // Initialize pre-filled slots visually
+                    this.updateSlots(); 
                 }, this.flashDuration); 
             },
 
