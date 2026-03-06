@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flash Mind: Ultimate Rev5</title>
+    <title>Flash Mind: Ultimate Rev6</title>
     <style>
         :root {
             --bg-color: #050010;
@@ -67,24 +67,48 @@
             color: var(--accent-color);
             letter-spacing: 6px;
             font-size: 0.8rem;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Knowledge Box */
-        .knowledge-box {
-            background: rgba(0, 204, 255, 0.1);
-            border-left: 4px solid var(--active-diff-color);
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            text-align: left;
+        /* Info Button & Modal */
+        .info-btn {
+            background: rgba(0, 204, 255, 0.2);
+            border: 1px solid var(--active-diff-color);
+            color: var(--active-diff-color);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            margin-left: 10px;
+            cursor: pointer;
             font-size: 0.8rem;
-            line-height: 1.4;
-            border-radius: 0 8px 8px 0;
-            color: #ccc;
+            font-weight: bold;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
         }
-        .knowledge-box strong { color: var(--active-diff-color); }
+        .info-btn:hover { background: var(--active-diff-color); color: #000; box-shadow: 0 0 10px var(--active-diff-color);}
+
+        .modal-overlay {
+            display: none; position: fixed; z-index: 1000; left: 0; top: 0; 
+            width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+            justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: #111; border: 1px solid var(--active-diff-color); box-shadow: 0 0 30px rgba(0,204,255,0.2);
+            padding: 25px; border-radius: 12px; max-width: 90%; width: 450px; text-align: left;
+            position: relative; color: #ddd; max-height: 80vh; overflow-y: auto;
+        }
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; }
+        .modal-close:hover { color: #fff; }
+        .modal-title { color: var(--active-diff-color); font-size: 1.2rem; margin-top: 0; margin-bottom: 15px; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 10px;}
+        .modal-body h3 { color: var(--primary-color); font-size: 1rem; margin: 15px 0 5px 0;}
+        .modal-body p { font-size: 0.85rem; line-height: 1.6; margin: 0 0 10px 0; color: #bbb;}
 
         /* Sections */
         .section-box {
@@ -125,41 +149,17 @@
 
         /* Mode Selection Buttons */
         button.start-btn { 
-            width: 100%; 
-            padding: 10px; 
-            font-size: 1rem; 
-            background: linear-gradient(90deg, #333, #444);
-            border: 1px solid #555;
-            color: #fff; 
-            font-weight: bold; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: transform 0.1s;
+            width: 100%; padding: 10px; font-size: 1rem; 
+            background: linear-gradient(90deg, #333, #444); border: 1px solid #555;
+            color: #fff; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-radius: 4px; cursor: pointer; transition: transform 0.1s;
         }
         button.start-btn:active { transform: scale(0.97); }
         
-        button.color-btn {
-            background: linear-gradient(90deg, #1c5e71, #1898c4);
-            border-color: #00ccff;
-            color: #fff;
-        }
-
-        button.plate-btn {
-            background: linear-gradient(90deg, #4b1c71, #8418c4);
-            border-color: var(--accent-color);
-        }
-
-        button.mobile-btn {
-            background: linear-gradient(90deg, #005544, #00a877);
-            border-color: var(--success-color);
-            grid-column: span 2;
-        }
-        
-        button.brawl-btn {
-            background: linear-gradient(135deg, #ff3860, #b026ff);
-            border: none;
-        }
+        button.color-btn { background: linear-gradient(90deg, #1c5e71, #1898c4); border-color: #00ccff; color: #fff; }
+        button.plate-btn { background: linear-gradient(90deg, #4b1c71, #8418c4); border-color: var(--accent-color); }
+        button.mobile-btn { background: linear-gradient(90deg, #005544, #00a877); border-color: var(--success-color); grid-column: span 2; }
+        button.brawl-btn { background: linear-gradient(135deg, #ff3860, #b026ff); border: none; }
 
         /* Game Display */
         .status-bar {
@@ -174,10 +174,7 @@
             border-radius: 10px; border: 1px solid #333; overflow: hidden;
         }
 
-        .big-text {
-            font-size: 3rem; font-weight: 900; font-family: 'Courier New', monospace;
-            letter-spacing: 2px; position: absolute; width: 100%; text-align: center;
-        }
+        .big-text { font-size: 3rem; font-weight: 900; font-family: 'Courier New', monospace; letter-spacing: 2px; position: absolute; width: 100%; text-align: center; }
         .countdown { color: var(--accent-color); animation: pulse 0.5s infinite alternate; font-size: 4rem;}
         .target-number { color: #fff; text-shadow: 0 0 30px #fff; display: none; z-index: 5;}
         
@@ -187,32 +184,19 @@
 
         /* Color Blocks */
         .color-block {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            margin: 0 3px;
-            border-radius: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.4);
-            vertical-align: middle;
+            display: inline-block; width: 32px; height: 32px; margin: 0 4px; border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.4); vertical-align: middle;
         }
-
-        @media (max-width: 400px) {
-            .color-block { width: 24px; height: 24px; margin: 0 2px; border-radius: 4px;}
-        }
+        @media (max-width: 400px) { .color-block { width: 28px; height: 28px; margin: 0 3px; border-radius: 4px;} }
 
         /* Input Slots */
-        .input-slots {
-            display: flex; gap: 4px; margin-bottom: 15px; justify-content: center;
-            height: 55px; align-items: center; width: 100%; flex-wrap: wrap;
-        }
-
+        .input-slots { display: flex; gap: 4px; margin-bottom: 15px; justify-content: center; height: 55px; align-items: center; width: 100%; flex-wrap: wrap; }
         .slot {
-            width: 38px; height: 55px; background: var(--glass); border: 1px solid #444;
-            border-radius: 4px; font-size: 1.8rem; display: flex; align-items: center; justify-content: center;
-            transition: all 0.1s; font-weight: bold; font-family: monospace;
+            width: 38px; height: 55px; background: var(--glass); border: 1px solid #444; border-radius: 4px;
+            font-size: 1.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.1s; font-weight: bold; font-family: monospace;
         }
-
+        
+        .slot.fixed-slot { background: rgba(255,255,255,0.02) !important; color: #666; border-color: #222; }
         .input-slots.compact .slot { width: 26px; height: 45px; font-size: 1.3rem; gap: 2px;}
         .input-slots.compact .separator { font-size: 1.5rem; margin: 0; }
 
@@ -235,12 +219,7 @@
         .keypad button.delete-btn { color: var(--error-color); border-color: #522; font-weight: bold; }
         .keypad.alpha-mode .delete-btn { grid-column: span 2; }
 
-        .color-key {
-            font-weight: 900 !important;
-            font-size: 1.2rem !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            border: 2px solid rgba(255,255,255,0.2) !important;
-        }
+        .color-key { font-weight: 900 !important; font-size: 1.2rem !important; text-shadow: 0 1px 3px rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.2) !important; }
 
         /* Top Controls */
         .top-controls { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 100;}
@@ -262,13 +241,31 @@
         <button class="control-btn" onclick="toggleMute()" id="mute-btn">MUSIC: ON</button>
     </div>
 
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <div class="modal-title">🧠 認知心理學小實驗室</div>
+            <div class="modal-body">
+                <h3>1. 米勒定律 (The Magical Number 7±2)</h3>
+                
+                <p>1956年，心理學家 George A. Miller 提出，人類的「短期記憶」容量非常有限，大腦處理器在不借助其他工具的情況下，大約只能同時記住 <strong>5 到 9 個項目 (7±2)</strong>。一旦超過這個極限，資訊就會開始流失。</p>
+                
+                <h3>2. 組塊記憶 (Chunking)</h3>
+                
+                <p>為了解決認知超載，大腦演化出了「組塊」的能力。這是一種將零散資訊「打包」成有意義群組的技巧。<br>
+                例如：一組 10 碼的手機號碼 <code>0918356443</code> 對大腦來說是 10 個獨立資訊；但加上分隔符號後 <code>0918-356-443</code>，大腦會將其視為 <strong>3 個區塊</strong>，瞬間破解了 7±2 的限制！</p>
+                
+                <h3>3. 視覺-語義轉換 (為何顏色更難？)</h3>
+                <p>在本遊戲的「色彩模式」中，你的大腦必須先在視覺皮層接收「顏色」，然後迅速到大腦皮層提取對應的「文字語言標籤」（如：看到紅色方塊，要在鍵盤尋找『紅』字）。這種跨頻道的轉換極度消耗認知資源，所以顏色模式能記住 3~5 個就非常厲害了！</p>
+            </div>
+        </div>
+    </div>
+
     <div id="start-screen" class="screen active">
         <h1>FLASH MIND</h1>
-        <div class="subtitle">COGNITIVE LAB</div>
-
-        <div class="knowledge-box">
-            <strong>💡 腦科學小知識 (視覺-語義轉換)：</strong><br>
-            在大腦運作中，看到「顏色」並在鍵盤上找到對應的「顏色文字」需要跨越視覺皮層與語言中樞。試著挑戰你的瞬時記憶與色彩映射能力吧！
+        <div class="subtitle">
+            COGNITIVE LAB
+            <button class="info-btn" onclick="openModal()" title="了解腦科學小知識">i</button>
         </div>
         
         <div class="section-box">
@@ -284,13 +281,11 @@
         <div class="section-box" style="padding-bottom: 5px;">
             <div class="sec-label">STEP 2: 記憶挑戰模式</div>
             
-            <div class="sec-label" style="font-size: 0.75rem; color:#666; margin-bottom: 5px;">▶ 視覺記憶：色彩方塊 (7±2) <span style="color:#00ccff">NEW!</span></div>
-            <div class="grid-6" style="margin-bottom: 10px;">
+            <div class="sec-label" style="font-size: 0.75rem; color:#666; margin-bottom: 5px;">▶ 視覺語義轉換：色彩方塊 (3~5)</div>
+            <div class="grid-4" style="margin-bottom: 10px;">
+                <button class="btn-small start-btn color-btn" onclick="game.init('color_3')">3色</button>
+                <button class="btn-small start-btn color-btn" onclick="game.init('color_4')">4色</button>
                 <button class="btn-small start-btn color-btn" onclick="game.init('color_5')">5色</button>
-                <button class="btn-small start-btn color-btn" onclick="game.init('color_6')">6色</button>
-                <button class="btn-small start-btn color-btn" onclick="game.init('color_7')">7色</button>
-                <button class="btn-small start-btn color-btn" onclick="game.init('color_8')">8色</button>
-                <button class="btn-small start-btn color-btn" onclick="game.init('color_9')">9色</button>
                 <button class="btn-small start-btn color-btn" style="border-color:#fff;" onclick="game.init('color_mixed')">混雜</button>
             </div>
 
@@ -309,8 +304,8 @@
                 <button class="start-btn plate-btn" onclick="game.init('old_car')">舊款汽車 <span class="small-desc">2英-4數</span></button>
                 <button class="start-btn plate-btn" onclick="game.init('new_car')">新款汽車 <span class="small-desc">3英-4數</span></button>
                 <button class="start-btn plate-btn" onclick="game.init('motorcycle')">一般機車 <span class="small-desc">3英-3數</span></button>
-                <button class="start-btn brawl-btn" onclick="game.init('plate_mixed')">車牌大亂鬥 <span class="small-desc">隨機車牌切換</span></button>
-                <button class="start-btn mobile-btn" onclick="game.init('mobile')">手機號碼 <span class="small-desc">09XX - XXX - XXX</span></button>
+                <button class="start-btn brawl-btn" onclick="game.init('plate_mixed')">車牌大亂鬥 <span class="small-desc">隨機切換</span></button>
+                <button class="start-btn mobile-btn" onclick="game.init('mobile')">手機號碼 <span class="small-desc">(已預填 09) XXX - XXX</span></button>
             </div>
         </div>
     </div>
@@ -350,6 +345,11 @@
     </div>
 
     <script>
+        // --- Modal Control ---
+        function openModal() { document.getElementById('info-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('info-modal').style.display = 'none'; }
+        window.onclick = function(event) { if (event.target == document.getElementById('info-modal')) closeModal(); }
+
         // --- Difficulty & Audio System ---
         let currentDifficulty = 'normal';
         const difficulties = {
@@ -455,7 +455,6 @@
             digitCount: 6, letterCount: 0,
             flashDuration: 500, countdownInterval: null,
 
-            // Color Map for Color Mode
             colorMap: {
                 '1': { name: '紅', bg: '#ff3b30', text: '#fff' },
                 '2': { name: '橘', bg: '#ff9500', text: '#fff' },
@@ -469,8 +468,7 @@
             },
 
             modeNames: {
-                'color_5': '色彩(5色)', 'color_6': '色彩(6色)', 'color_7': '色彩(7色)', 
-                'color_8': '色彩(8色)', 'color_9': '色彩(9色)', 'color_mixed': '色彩(混雜)',
+                'color_3': '色彩(3色)', 'color_4': '色彩(4色)', 'color_5': '色彩(5色)', 'color_mixed': '色彩(混雜)',
                 'std_5': '純數字(5碼)', 'std_6': '純數字(6碼)', 'std_7': '純數字(7碼)', 
                 'std_8': '純數字(8碼)', 'std_9': '純數字(9碼)', 'std_mixed': '純數字(混雜)',
                 'old_car': '舊汽車', 'new_car': '新汽車', 'motorcycle': '機車', 
@@ -515,7 +513,8 @@
                 this.generateTarget();
                 this.initSlotsHTML(); 
                 
-                this.userInput = "";
+                // Pre-fill "09" for mobile mode
+                this.userInput = (this.currentFormat === 'mobile') ? "09" : "";
                 this.state = "counting";
                 
                 this.updateUI();
@@ -538,7 +537,7 @@
                     this.currentFormat = 'standard';
                 } else if (this.mode.startsWith('color_')) {
                     if (this.mode === 'color_mixed') {
-                        this.digitCount = Math.floor(Math.random() * 5) + 5; 
+                        this.digitCount = Math.floor(Math.random() * 3) + 3; // 3 to 5
                     } else {
                         this.digitCount = parseInt(this.mode.split('_')[1]);
                     }
@@ -563,7 +562,6 @@
                 if (this.currentFormat === 'standard') {
                     for(let i=0; i<this.digitCount; i++) t += Math.floor(Math.random() * 10);
                 } else if (this.currentFormat === 'color') {
-                    // Generate string of 1-9 indicating colors
                     for(let i=0; i<this.digitCount; i++) t += (Math.floor(Math.random() * 9) + 1).toString();
                 } else if (this.currentFormat === 'mobile') {
                     t = "09"; 
@@ -606,7 +604,13 @@
 
                     const div = document.createElement('div');
                     div.className = 'slot';
-                    div.style.background = ''; // reset inline background
+                    
+                    // Mark "09" as fixed slots visually
+                    if (this.currentFormat === 'mobile' && i < 2) {
+                        div.classList.add('fixed-slot');
+                    }
+                    
+                    div.style.background = ''; 
                     if(i < this.letterCount && this.currentFormat !== 'color') div.setAttribute('data-type', 'letter');
                     container.appendChild(div);
                 }
@@ -621,7 +625,7 @@
                 document.getElementById('countdown').style.display = 'none';
                 document.getElementById('target-number').style.display = 'none';
                 document.getElementById('reveal-answer').style.display = 'none';
-                document.getElementById('target-number').innerHTML = ''; // Clear for color mode
+                document.getElementById('target-number').innerHTML = ''; 
                 document.getElementById('reveal-text').innerHTML = '';
                 document.getElementById('target-number').style.fontSize = this.digitCount > 7 ? '2.5rem' : '3.5rem';
                 document.getElementById('reveal-text').style.fontSize = this.digitCount > 7 ? '2rem' : '2.5rem';
@@ -671,6 +675,7 @@
                 setTimeout(() => {
                     targetEl.style.display = 'none';
                     this.enableInput();
+                    this.updateSlots(); // Initialize pre-filled slots visually
                 }, this.flashDuration); 
             },
 
@@ -678,7 +683,6 @@
                 this.state = "input";
                 document.getElementById('keypad').classList.remove('disabled');
                 this.renderKeypad(); 
-                this.highlightCurrentSlot();
             },
 
             renderKeypad: function() {
@@ -761,7 +765,10 @@
             },
 
             delete: function() {
-                if (this.state !== "input" || this.userInput.length === 0) return;
+                // Prevent deleting the pre-filled "09"
+                const limit = (this.currentFormat === 'mobile') ? 2 : 0;
+                if (this.state !== "input" || this.userInput.length <= limit) return;
+                
                 this.userInput = this.userInput.slice(0, -1);
                 playSFX('input');
                 this.updateSlots();
@@ -804,15 +811,11 @@
                 for (let i = 0; i < this.digitCount; i++) {
                     if (this.userInput[i] === this.target[i]) {
                         slots[i].classList.add('correct');
-                        if (this.currentFormat === 'color') {
-                            slots[i].style.border = '2px solid var(--success-color)';
-                        }
+                        if (this.currentFormat === 'color') slots[i].style.border = '2px solid var(--success-color)';
                         roundScore++;
                     } else {
                         slots[i].classList.add('wrong');
-                        if (this.currentFormat === 'color') {
-                            slots[i].style.border = '2px solid var(--error-color)';
-                        }
+                        if (this.currentFormat === 'color') slots[i].style.border = '2px solid var(--error-color)';
                     }
                 }
 
@@ -873,7 +876,7 @@
                 }
                 else { 
                     title = "FAIL (失敗)"; color = "#ff3860"; 
-                    comment = "大腦發生了短期資訊打結，建議先挑戰少一點的色塊！";
+                    comment = "大腦發生了短期資訊打結，多練習就能加強神經連結！";
                 }
 
                 document.getElementById('final-score-text').innerText = `SCORE: ${finalScore}`;
